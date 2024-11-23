@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 libc = "0.2.164"
 libloading = "0.8.5"
+litcrypt = "0.3.0"
