@@ -8,14 +8,14 @@ build an example in either debug or release mode
 cargo build [--release] --example <example>
 ```
 
-Run an example with gdb. For release build, change `debug` to `release`
+Run an example with gdb. For a release build, change `debug` to `release`
 ```bash
 gdb -ex 'run' ./target/debug/examples/<example>
 ```
 
 Run an example with gdb while overwriting the `ptrace` wrapper function using a shared object and `LD_PRELOAD`
 ```bash
-gdb -ex 'set exec-wrapper env "LD_PRELOAD=./assets/deptrace.so"' -ex 'run' ./target/debug/examples/01-single-ptrace
+gdb -ex 'set exec-wrapper env "LD_PRELOAD=./assets/deptrace.so"' -ex 'run' ./target/debug/examples/<example>
 ```
 
 ## Acknowledgments
