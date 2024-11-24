@@ -8,7 +8,7 @@ build an example in either debug or release mode
 cargo build [--release] --example <example>
 ```
 
-Run an example with gdb. For release buuld, change `debug` to `release`
+Run an example with gdb. For release build, change `debug` to `release`
 ```bash
 gdb -ex 'run' ./target/debug/examples/<example>
 ```
