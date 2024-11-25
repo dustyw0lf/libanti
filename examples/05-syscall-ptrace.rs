@@ -15,7 +15,7 @@ unsafe fn not_ptrace(request: usize, pid: usize, addr: usize, data: usize) -> is
     let mut ret: usize;
     asm!(
         "syscall",
-        inlateout("rax") 101 as usize => ret, //ptrace syscall number
+        inlateout("rax") 101 as usize => ret, // ptrace syscall number
         in("rdi") request,                    // arg 1
         in("rsi") pid,                        // arg 2
         in("rdx") addr,                       // arg 3
