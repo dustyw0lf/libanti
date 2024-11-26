@@ -1,14 +1,14 @@
 use std::fs;
 
 fn main() {
-    if is_tracer_attached().unwrap() {
+    if is_traced().unwrap() {
         println!("Debugger");
     } else {
         println!("Normal");
     }
 }
 
-fn is_tracer_attached() -> Result<bool, Box<dyn std::error::Error>> {
+fn is_traced() -> Result<bool, Box<dyn std::error::Error>> {
     let status = fs::read_to_string("/proc/self/status").unwrap();
 
     for line in status.lines() {
