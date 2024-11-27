@@ -15,7 +15,7 @@ fn is_preloaded() -> Result<bool, Box<dyn std::error::Error>> {
         .last()
         .ok_or_else(|| "Failed to get binary name")?;
 
-    // Array of allowed names
+    // allowed names
     let maps = [
         exe,
         "linux-vdso.so.1",
