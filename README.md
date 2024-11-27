@@ -3,6 +3,7 @@
 This repository demonstrates anti-debugging techniques on Linux through sample implementations:
 - Multiple [ptrace](https://man7.org/linux/man-pages/man2/ptrace.2.html)-based approaches, ranging from basic self-debugging to techniques like dynamic function resolution and direct syscall invocation. Currently implemented without obfuscation.
 - Process tracing detection via the `TracerPid` field in [/proc/self/status](https://man7.org/linux/man-pages/man5/proc_pid_status.5.html).
+- Preloaded libraries detection via [/proc/self/maps](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html).
 
 
 ## Examples
