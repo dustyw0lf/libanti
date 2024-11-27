@@ -13,7 +13,7 @@ fn is_preloaded() -> Result<bool, Box<dyn std::error::Error>> {
     let exe = exe
         .split("/")
         .last()
-        .ok_or_else(|| "Faild to get binary name")?;
+        .ok_or_else(|| "Failed to get binary name")?;
 
     // Array of allowed names
     let maps = [
