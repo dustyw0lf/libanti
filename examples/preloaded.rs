@@ -19,8 +19,8 @@ fn is_preloaded() -> Result<bool, Box<dyn std::error::Error>> {
     let maps = [
         exe,
         "linux-vdso.so.1",
-        "namegcc_s.so.1",
-        "namec.so.6",
+        "libgcc_s.so.1",
+        "libc.so.6",
         "ld-linux-x86-64.so.2",
         "[heap]",
         "[stack]",
