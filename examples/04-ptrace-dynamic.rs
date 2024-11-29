@@ -22,7 +22,7 @@ type NotPtraceFn = unsafe extern "C" fn(
 ) -> c_long;
 
 pub fn get_not_ptrace() -> Result<NotPtraceFn, Box<dyn std::error::Error>> {
-    let lib = get_lib("libc.so.6")?;
+    let lib = get_lib()?;
     unsafe {
         let not_ptrace: Symbol<NotPtraceFn> = lib.get(b"ptrace\0")?;
         Ok(*not_ptrace.into_raw())
