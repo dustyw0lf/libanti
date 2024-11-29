@@ -1,2 +1,2 @@
-pub mod utils;
-pub mod virt;
+pub mod detect;
+pub(crate) mod utils;
