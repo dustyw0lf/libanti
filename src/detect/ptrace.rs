@@ -20,7 +20,7 @@ pub fn get_ptrace() -> Result<PtraceFn, Box<dyn std::error::Error>> {
     }
 }
 
-unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -> isize {
+pub unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -> isize {
     // Based on
     // https://github.com/jasonwhite/syscalls/blob/main/src/syscall/x86_64.rs
     let mut ret: usize;
