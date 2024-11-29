@@ -1,10 +1,8 @@
 use std::ffi::{c_int, c_long, c_uint, c_void};
-use std::sync::Once;
 
-use libloading::{Library, Symbol};
+use libloading::Symbol;
 
-static INIT: Once = Once::new();
-static mut LIBC: Option<Library> = None;
+use linux_antidbg::utils::get_lib;
 
 fn main() {
     let not_ptrace = get_not_ptrace().unwrap();
@@ -16,16 +14,6 @@ fn main() {
     }
 }
 
-fn get_lib() -> Result<&'static Library, Box<dyn std::error::Error>> {
-    unsafe {
-        INIT.call_once(|| {
-            LIBC = Some(Library::new("libc.so.6").unwrap());
-        });
-
-        LIBC.as_ref().ok_or_else(|| "Failed to load library".into())
-    }
-}
-
 type NotPtraceFn = unsafe extern "C" fn(
     request: *const c_uint,
     pid: c_int,
@@ -34,7 +22,7 @@ type NotPtraceFn = unsafe extern "C" fn(
 ) -> c_long;
 
 pub fn get_not_ptrace() -> Result<NotPtraceFn, Box<dyn std::error::Error>> {
-    let lib = get_lib()?;
+    let lib = get_lib("libc.so.6")?;
     unsafe {
         let not_ptrace: Symbol<NotPtraceFn> = lib.get(b"ptrace\0")?;
         Ok(*not_ptrace.into_raw())
