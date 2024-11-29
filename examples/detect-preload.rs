@@ -1,4 +1,4 @@
-use linux_antidbg::detect::preload::is_preloaded_procfs;
+use linux_antidbg::preload::is_preloaded_procfs;
 
 fn main() {
     if is_preloaded_procfs().unwrap() {

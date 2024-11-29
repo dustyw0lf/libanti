@@ -1,4 +1,4 @@
-use linux_antidbg::detect::virt::{is_virt_cpu, is_virt_disk};
+use linux_antidbg::virt::{is_virt_cpu, is_virt_disk};
 
 fn main() {
     if is_virt_cpu().unwrap() {
