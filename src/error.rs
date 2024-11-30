@@ -8,21 +8,49 @@ pub enum Error {
     Io(io::Error),
     /// Error parsing procfs content
     ProcFsParse(String),
-    /// Error loading dynamic library
-    LibLoad(libloading::Error),
     /// Error accessing CPU information
-    CpuId(String),
-    /// General system call error
-    Syscall(String),
-    /// Generic error with message
-    Other(String),
+    CpuId(CpuIdError),
+    /// Error resolving functions at runtime
+    Init(InitError),
+}
+
+#[derive(Debug)]
+pub enum CpuIdError {
+    /// Brand string not available
+    MissingBrandString,
+}
+
+impl fmt::Display for CpuIdError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            CpuIdError::MissingBrandString => write!(f, "{:?}", self),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum InitError {
+    /// Failure to resolve function
+    FunctionResolution(&'static str),
+    /// Failure to initialize library
+    LibraryInit(&'static str),
+}
+
+impl fmt::Display for InitError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InitError::FunctionResolution(func) => {
+                write!(f, "failed to resolve function: {}", func)
+            }
+            InitError::LibraryInit(lib) => write!(f, "failed to initialize library: {}", lib),
+        }
+    }
 }
 
 impl error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Error::Io(e) => Some(e),
-            Error::LibLoad(e) => Some(e),
             _ => None,
         }
     }
@@ -31,12 +59,10 @@ impl error::Error for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::Io(e) => write!(f, "filesystem error: {}", e),
-            Error::ProcFsParse(e) => write!(f, "procfs parse error: {}", e),
-            Error::LibLoad(e) => write!(f, "library loading error: {}", e),
-            Error::CpuId(e) => write!(f, "CPU ID error: {}", e),
-            Error::Syscall(e) => write!(f, "syscall error: {}", e),
-            Error::Other(e) => write!(f, "{}", e),
+            Error::Io(e) => write!(f, "{}", e),
+            Error::ProcFsParse(e) => write!(f, "{}", e),
+            Error::CpuId(e) => write!(f, "{}", e),
+            Error::Init(e) => write!(f, "{}", e),
         }
     }
 }
@@ -44,11 +70,5 @@ impl fmt::Display for Error {
 impl From<io::Error> for Error {
     fn from(err: io::Error) -> Self {
         Error::Io(err)
-    }
-}
-
-impl From<libloading::Error> for Error {
-    fn from(err: libloading::Error) -> Self {
-        Error::LibLoad(err)
     }
 }
