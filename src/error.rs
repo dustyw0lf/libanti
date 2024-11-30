@@ -16,7 +16,6 @@ pub enum Error {
 
 #[derive(Debug)]
 pub enum CpuIdError {
-    /// Brand string not available
     MissingBrandString,
 }
 
