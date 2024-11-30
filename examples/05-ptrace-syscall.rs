@@ -1,7 +1,7 @@
-use libanti::debug::syscall_ptrace;
+use libanti::debug::is_ptraced_syscall;
 
 fn main() {
-    if unsafe { syscall_ptrace(0, 0, 0, 0) } == -1 {
+    if is_ptraced_syscall().unwrap() {
         println!("Debugger");
     } else {
         println!("Normal");
