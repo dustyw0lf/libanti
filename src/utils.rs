@@ -1,16 +1,25 @@
-use std::sync::Once;
-
+use crate::error::{Error, Result};
 use libloading::Library;
+use std::sync::{Once, OnceLock};
 
-static INIT_LIBC: Once = Once::new();
+static LIBC_INIT: Once = Once::new();
 static mut LIBC: Option<Library> = None;
+static LIBC_INIT_ERROR: OnceLock<String> = OnceLock::new();
 
-pub(crate) fn get_libc() -> Result<&'static Library, Box<dyn std::error::Error>> {
+pub(crate) fn get_libc() -> Result<&'static Library> {
     unsafe {
-        INIT_LIBC.call_once(|| {
-            LIBC = Some(Library::new("libc.so.6").unwrap());
+        LIBC_INIT.call_once(|| match Library::new("libc.so.6") {
+            Ok(lib) => LIBC = Some(lib),
+            Err(e) => {
+                let _ = LIBC_INIT_ERROR.set(e.to_string());
+            }
         });
 
-        LIBC.as_ref().ok_or_else(|| "Failed to load library".into())
+        if let Some(err) = LIBC_INIT_ERROR.get() {
+            return Err(Error::Other(err.clone()));
+        }
+
+        LIBC.as_ref()
+            .ok_or_else(|| Error::Other("failed to initialize libc".to_string()))
     }
 }
