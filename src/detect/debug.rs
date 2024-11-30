@@ -33,7 +33,7 @@ type PtraceFn = unsafe extern "C" fn(
     data: *mut c_void,
 ) -> c_long;
 
-static PTRACE_INIT: Once = Once::new();
+static INIT_PTRACE: Once = Once::new();
 static mut PTRACE: Option<PtraceFn> = None;
 
 /// Detects if a debugger is present by dynamically resolving and calling ptrace.
@@ -44,7 +44,7 @@ pub fn is_ptraced_dynamic() -> Result<bool, Box<dyn std::error::Error>> {
     let lib = get_lib("libc.so.6")?;
 
     let ptrace = unsafe {
-        PTRACE_INIT.call_once(|| {
+        INIT_PTRACE.call_once(|| {
             // Double dereference:
             // first * get &PtraceFn from Symbol<PtraceFn>
             // second * gets the actual function pointer from &PtraceFn
