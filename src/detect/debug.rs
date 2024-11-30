@@ -1,6 +1,7 @@
 use core::arch::asm;
 use std::ffi::{c_int, c_long, c_uint, c_void};
 use std::fs;
+use std::sync::Once;
 
 use libloading::Symbol;
 
@@ -32,12 +33,32 @@ type PtraceFn = unsafe extern "C" fn(
     data: *mut c_void,
 ) -> c_long;
 
-pub fn get_ptrace() -> Result<PtraceFn, Box<dyn std::error::Error>> {
+static PTRACE_INIT: Once = Once::new();
+static mut PTRACE: Option<PtraceFn> = None;
+
+/// Detects if a debugger is present by dynamically resolving and calling ptrace.
+///
+/// Returns `Ok(true)` if a debugger is detected, `Ok(false)` if no debugger is present,
+/// and `Err` if ptrace resolution fails.
+pub fn is_ptraced_dynamic() -> Result<bool, Box<dyn std::error::Error>> {
     let lib = get_lib("libc.so.6")?;
-    unsafe {
-        let ptrace: Symbol<PtraceFn> = lib.get(b"ptrace\0")?;
-        Ok(*ptrace.into_raw())
-    }
+
+    let ptrace = unsafe {
+        PTRACE_INIT.call_once(|| {
+            // Double dereference:
+            // first * get &PtraceFn from Symbol<PtraceFn>
+            // second * gets the actual function pointer from &PtraceFn
+            PTRACE = Some(**lib.get::<Symbol<PtraceFn>>(b"ptrace\0").unwrap());
+        });
+
+        PTRACE.ok_or_else(|| "Failed to resolve ptrace")?
+    };
+
+    let res = unsafe { ptrace(0 as *const c_uint, 0, 0 as *mut c_void, 0 as *mut c_void) };
+
+    // If the process was already being traced, return true
+    // If the process wasn't already being traced, return false
+    Ok(res != 0)
 }
 
 unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -> isize {
