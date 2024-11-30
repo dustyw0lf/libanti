@@ -1,6 +1,6 @@
 use std::ffi::{c_uint, c_void};
 
-use libanti::ptrace::get_ptrace;
+use libanti::debug::get_ptrace;
 
 fn main() {
     let ptrace = get_ptrace().unwrap();
