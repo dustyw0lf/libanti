@@ -1,13 +1,14 @@
 use core::arch::asm;
 use std::ffi::{c_int, c_long, c_uint, c_void};
 use std::fs;
-use std::sync::Once;
+use std::sync::{Once, OnceLock};
 
 use libloading::Symbol;
 
+use crate::error::{Error, Result};
 use crate::utils::get_libc;
 
-pub fn is_traced() -> Result<bool, Box<dyn std::error::Error>> {
+pub fn is_traced() -> Result<bool> {
     let status = fs::read_to_string("/proc/self/status").unwrap();
 
     for line in status.lines() {
@@ -15,8 +16,9 @@ pub fn is_traced() -> Result<bool, Box<dyn std::error::Error>> {
             let status = line
                 .split_whitespace()
                 .last()
-                .ok_or_else(|| "Error getting tracer pid")?
-                .parse::<isize>()?;
+                .ok_or_else(|| Error::ProcFsParse("missing TracerPid value".to_string()))?
+                .parse::<isize>()
+                .map_err(|_| Error::ProcFsParse("invalid TracerPid value".to_string()))?;
             if status != 0 {
                 return Ok(true);
             }
@@ -33,25 +35,33 @@ type PtraceFn = unsafe extern "C" fn(
     data: *mut c_void,
 ) -> c_long;
 
-static INIT_PTRACE: Once = Once::new();
+static PTRACE_INIT: Once = Once::new();
 static mut PTRACE: Option<PtraceFn> = None;
+static PTRACE_INIT_ERROR: OnceLock<String> = OnceLock::new();
 
 /// Detects if a debugger is present by dynamically resolving and calling ptrace.
 ///
 /// Returns `Ok(true)` if a debugger is detected, `Ok(false)` if no debugger is present,
 /// and `Err` if ptrace resolution fails.
-pub fn is_ptraced_dynamic() -> Result<bool, Box<dyn std::error::Error>> {
+pub fn is_ptraced_dynamic() -> Result<bool> {
     let lib = get_libc()?;
 
     let ptrace = unsafe {
-        INIT_PTRACE.call_once(|| {
+        PTRACE_INIT.call_once(|| match lib.get::<Symbol<PtraceFn>>(b"ptrace\0") {
             // Double dereference:
             // first * get &PtraceFn from Symbol<PtraceFn>
             // second * gets the actual function pointer from &PtraceFn
-            PTRACE = Some(**lib.get::<Symbol<PtraceFn>>(b"ptrace\0").unwrap());
+            Ok(sym) => PTRACE = Some(**sym),
+            Err(e) => {
+                let _ = PTRACE_INIT_ERROR.set(format!("failed to resolve ptrace: {}", e));
+            }
         });
 
-        PTRACE.ok_or_else(|| "Failed to resolve ptrace")?
+        if let Some(err) = PTRACE_INIT_ERROR.get() {
+            return Err(Error::Other(err.clone()));
+        }
+
+        PTRACE.ok_or_else(|| Error::Other("failed to initialize ptrace".to_string()))?
     };
 
     let res = unsafe { ptrace(0 as *const c_uint, 0, 0 as *mut c_void, 0 as *mut c_void) };
@@ -83,7 +93,7 @@ unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -
 ///
 /// Returns `Ok(true)` if a debugger is detected and `Ok(false)` if no debugger is present.
 /// The function is currently infallible, but returns `Result` for consistency with other functions.
-pub fn is_ptraced_syscall() -> Result<bool, Box<dyn std::error::Error>> {
+pub fn is_ptraced_syscall() -> Result<bool> {
     let res = unsafe { syscall_ptrace(0, 0, 0, 0) };
 
     // If the process was already being traced, return true
