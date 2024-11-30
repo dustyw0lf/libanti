@@ -1,5 +1,6 @@
 mod detect;
-pub(crate) mod utils;
+mod error;
+mod utils;
 
 // Re-export detection submodules
 pub use detect::*;
