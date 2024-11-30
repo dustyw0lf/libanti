@@ -40,7 +40,7 @@ pub fn get_ptrace() -> Result<PtraceFn, Box<dyn std::error::Error>> {
     }
 }
 
-pub unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -> isize {
+unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -> isize {
     // Based on
     // https://github.com/jasonwhite/syscalls/blob/main/src/syscall/x86_64.rs
     let mut ret: usize;
@@ -56,4 +56,15 @@ pub unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usiz
         options(nostack, preserves_flags)
     );
     ret as isize
+}
+
+pub fn is_ptraced_syscall() -> Result<bool, Box<dyn std::error::Error>> {
+    let res = unsafe { syscall_ptrace(0, 0, 0, 0) };
+    if res == 0 {
+        // If the process wasn't already being traced, return false
+        Ok(false)
+    } else {
+        // If the process was being traced, return true
+        Ok(true)
+    }
 }
