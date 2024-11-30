@@ -35,8 +35,8 @@ type PtraceFn = unsafe extern "C" fn(
 pub fn get_ptrace() -> Result<PtraceFn, Box<dyn std::error::Error>> {
     let lib = get_lib("libc.so.6")?;
     unsafe {
-        let not_ptrace: Symbol<PtraceFn> = lib.get(b"ptrace\0")?;
-        Ok(*not_ptrace.into_raw())
+        let ptrace: Symbol<PtraceFn> = lib.get(b"ptrace\0")?;
+        Ok(*ptrace.into_raw())
     }
 }
 
