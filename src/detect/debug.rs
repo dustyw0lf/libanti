@@ -81,11 +81,8 @@ unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -
 
 pub fn is_ptraced_syscall() -> Result<bool, Box<dyn std::error::Error>> {
     let res = unsafe { syscall_ptrace(0, 0, 0, 0) };
-    if res == 0 {
-        // If the process wasn't already being traced, return false
-        Ok(false)
-    } else {
-        // If the process was being traced, return true
-        Ok(true)
-    }
+
+    // If the process was already being traced, return true
+    // If the process wasn't already being traced, return false
+    Ok(res != 0)
 }
