@@ -1,7 +1,12 @@
 [package]
 name = "libanti"
+authors = ["dustyw0lf"]
 version = "0.1.0"
 edition = "2021"
+description = "Anti reversing techniques for Linux"
+repository = "https://github.com/dustyw0lf/libanti"
+keywords = ["linux"]
+include = ["src", "Cargo.toml", "README.md"]
 
 [dependencies]
 libc = "0.2.167"
