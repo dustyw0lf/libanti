@@ -1,6 +1,8 @@
-use crate::error::{Error, Result};
-use libloading::Library;
 use std::sync::{Once, OnceLock};
+
+use libloading::Library;
+
+use crate::error::{Error, Result};
 
 static LIBC_INIT: Once = Once::new();
 static mut LIBC: Option<Library> = None;
