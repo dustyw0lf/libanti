@@ -2,15 +2,15 @@ use std::sync::Once;
 
 use libloading::Library;
 
-static INIT: Once = Once::new();
-static mut LIB: Option<Library> = None;
+static INIT_LIBC: Once = Once::new();
+static mut LIBC: Option<Library> = None;
 
-pub(crate) fn get_lib(lib: &str) -> Result<&'static Library, Box<dyn std::error::Error>> {
+pub(crate) fn get_libc() -> Result<&'static Library, Box<dyn std::error::Error>> {
     unsafe {
-        INIT.call_once(|| {
-            LIB = Some(Library::new(lib).unwrap());
+        INIT_LIBC.call_once(|| {
+            LIBC = Some(Library::new("libc.so.6").unwrap());
         });
 
-        LIB.as_ref().ok_or_else(|| "Failed to load library".into())
+        LIBC.as_ref().ok_or_else(|| "Failed to load library".into())
     }
 }
