@@ -1,9 +1,29 @@
 use core::arch::asm;
 use std::ffi::{c_int, c_long, c_uint, c_void};
+use std::fs;
 
 use libloading::Symbol;
 
 use crate::utils::get_lib;
+
+pub fn is_traced() -> Result<bool, Box<dyn std::error::Error>> {
+    let status = fs::read_to_string("/proc/self/status").unwrap();
+
+    for line in status.lines() {
+        if line.contains("TracerPid") {
+            let status = line
+                .split_whitespace()
+                .last()
+                .ok_or_else(|| "Error getting tracer pid")?
+                .parse::<isize>()?;
+            if status != 0 {
+                return Ok(true);
+            }
+        };
+    }
+
+    Ok(false)
+}
 
 type PtraceFn = unsafe extern "C" fn(
     request: *const c_uint,
