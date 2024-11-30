@@ -2,13 +2,13 @@ use std::fs;
 
 use raw_cpuid::CpuId;
 
-use crate::error::{Error, Result};
+use crate::error::{CpuIdError, Error, Result};
 
 pub fn is_virt_cpu() -> Result<bool> {
     let cpuid = CpuId::new();
     let brand = cpuid
         .get_processor_brand_string()
-        .ok_or_else(|| Error::CpuId("failed to get processor brand string".to_string()))?;
+        .ok_or_else(|| Error::CpuId(CpuIdError::MissingBrandString))?;
     let brand = brand.as_str();
 
     if brand.contains("Intel") || brand.contains("AMD") {
