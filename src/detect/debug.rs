@@ -5,7 +5,7 @@ use std::sync::{Once, OnceLock};
 
 use libloading::Symbol;
 
-use crate::error::{Error, Result};
+use crate::error::{Error, InitError, Result};
 use crate::utils::get_libc;
 
 pub fn is_traced() -> Result<bool> {
@@ -58,10 +58,10 @@ pub fn is_ptraced_dynamic() -> Result<bool> {
         });
 
         if let Some(err) = PTRACE_INIT_ERROR.get() {
-            return Err(Error::Other(err.clone()));
+            return Err(Error::Init(InitError::FunctionResolution(err)));
         }
 
-        PTRACE.ok_or_else(|| Error::Other("failed to initialize ptrace".to_string()))?
+        PTRACE.ok_or_else(|| Error::Init(InitError::FunctionResolution("ptrace")))?
     };
 
     let res = unsafe { ptrace(0 as *const c_uint, 0, 0 as *mut c_void, 0 as *mut c_void) };
