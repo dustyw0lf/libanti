@@ -1,11 +1,7 @@
-use std::ffi::{c_uint, c_void};
-
-use libanti::debug::get_ptrace;
+use libanti::debug::is_ptraced_dynamic;
 
 fn main() {
-    let ptrace = get_ptrace().unwrap();
-
-    if unsafe { ptrace(0 as *const c_uint, 0, 0 as *mut c_void, 0 as *mut c_void) } == -1 {
+    if is_ptraced_dynamic().unwrap() {
         println!("Debugger");
     } else {
         println!("Normal");
