@@ -79,6 +79,10 @@ unsafe fn syscall_ptrace(request: usize, pid: usize, addr: usize, data: usize) -
     ret as isize
 }
 
+/// Detects if a debugger is present by calling the ptrace syscall directly.
+///
+/// Returns `Ok(true)` if a debugger is detected and `Ok(false)` if no debugger is present.
+/// The function is currently infallible, but returns `Result` for consistency with other functions.
 pub fn is_ptraced_syscall() -> Result<bool, Box<dyn std::error::Error>> {
     let res = unsafe { syscall_ptrace(0, 0, 0, 0) };
 
