@@ -1,11 +1,13 @@
 use std::{env, fs};
 
-pub fn is_preloaded_procfs() -> Result<bool, Box<dyn std::error::Error>> {
+use crate::error::{Error, Result};
+
+pub fn is_preloaded_procfs() -> Result<bool> {
     let exe = env::current_exe()?.display().to_string();
     let exe = exe
         .split("/")
         .last()
-        .ok_or_else(|| "Failed to get binary name")?;
+        .ok_or_else(|| Error::ProcFsParse("invalid executable path".to_string()))?;
 
     // allowed names
     let maps = [
@@ -31,7 +33,7 @@ pub fn is_preloaded_procfs() -> Result<bool, Box<dyn std::error::Error>> {
         let name = name
             .split("/")
             .last()
-            .ok_or_else(|| format!("Error splitting map: {}", line))?;
+            .ok_or_else(|| Error::ProcFsParse(format!("invalid map entry: {}", line)))?;
 
         if !maps.contains(&name) {
             // println!("{}", name);
