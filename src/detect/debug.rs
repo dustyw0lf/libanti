@@ -5,7 +5,7 @@ use std::sync::Once;
 
 use libloading::Symbol;
 
-use crate::utils::get_lib;
+use crate::utils::get_libc;
 
 pub fn is_traced() -> Result<bool, Box<dyn std::error::Error>> {
     let status = fs::read_to_string("/proc/self/status").unwrap();
@@ -41,7 +41,7 @@ static mut PTRACE: Option<PtraceFn> = None;
 /// Returns `Ok(true)` if a debugger is detected, `Ok(false)` if no debugger is present,
 /// and `Err` if ptrace resolution fails.
 pub fn is_ptraced_dynamic() -> Result<bool, Box<dyn std::error::Error>> {
-    let lib = get_lib("libc.so.6")?;
+    let lib = get_libc()?;
 
     let ptrace = unsafe {
         INIT_PTRACE.call_once(|| {
