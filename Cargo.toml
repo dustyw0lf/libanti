@@ -10,6 +10,5 @@ include = ["src", "Cargo.toml", "README.md"]
 
 [dependencies]
 libc = "0.2.167"
-libloading = "0.8.6"
 litcrypt = "0.3.0"
 raw-cpuid = "11.2.0"
