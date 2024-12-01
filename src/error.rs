@@ -10,8 +10,6 @@ pub enum Error {
     ProcFsParse(String),
     /// Error accessing CPU information
     CpuId(CpuIdError),
-    /// Error resolving functions at runtime
-    Init(InitError),
 }
 
 #[derive(Debug)]
@@ -23,25 +21,6 @@ impl fmt::Display for CpuIdError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CpuIdError::MissingBrandString => write!(f, "{:?}", self),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum InitError {
-    /// Failure to resolve function
-    FunctionResolution(&'static str),
-    /// Failure to initialize library
-    LibraryInit(&'static str),
-}
-
-impl fmt::Display for InitError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            InitError::FunctionResolution(func) => {
-                write!(f, "failed to resolve function: {}", func)
-            }
-            InitError::LibraryInit(lib) => write!(f, "failed to initialize library: {}", lib),
         }
     }
 }
@@ -61,7 +40,6 @@ impl fmt::Display for Error {
             Error::Io(e) => write!(f, "{}", e),
             Error::ProcFsParse(e) => write!(f, "{}", e),
             Error::CpuId(e) => write!(f, "{}", e),
-            Error::Init(e) => write!(f, "{}", e),
         }
     }
 }
