@@ -4,7 +4,7 @@ use std::fs;
 use crate::error::{Error, Result};
 
 pub fn is_traced() -> Result<bool> {
-    let status = fs::read_to_string("/proc/self/status").unwrap();
+    let status = fs::read_to_string("/proc/self/status")?;
 
     for line in status.lines() {
         if line.contains("TracerPid") {
