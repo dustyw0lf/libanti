@@ -1,9 +1,14 @@
-# Linux Anti Debugging
+# Linux Anti Reversing
 
-This repository demonstrates anti-debugging techniques on Linux through sample implementations:
-- Multiple [ptrace](https://man7.org/linux/man-pages/man2/ptrace.2.html)-based approaches, ranging from basic self-debugging to techniques like dynamic function resolution and direct syscall invocation. Currently implemented without obfuscation.
-- Process tracing detection via the `TracerPid` field in [/proc/self/status](https://man7.org/linux/man-pages/man5/proc_pid_status.5.html).
-- Preloaded libraries detection via [/proc/self/maps](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html).
+This library contains functions to detect attempts to tamper with a running process. Currently implemented without obfuscation:
+1. Debugger detection:
+    - Directly invoking [ptrace](https://man7.org/linux/man-pages/man2/ptrace.2.html) as a system call, and as such not calling it from libc.
+    - Checking the `TracerPid` field in [/proc/self/status](https://man7.org/linux/man-pages/man5/proc_pid_status.5.html).
+2. Preloaded libraries detection:
+    - Checking [/proc/self/maps](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html) for unusual shared objects.
+3. Virtual machine detection:
+    - Checking the `cpuid` brand string for unusual CPUs.
+    - Checking the `/dev/disk/by-path` directory for virtual disks. 
 
 
 ## Examples
