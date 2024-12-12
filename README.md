@@ -10,6 +10,10 @@ This library contains functions to detect attempts to tamper with a running proc
     - Checking the `cpuid` brand string for unusual CPUs.
     - Checking the `/dev/disk/by-path` directory for virtual disks. 
 
+## Usage
+Add `libanti` as a dependency to your Rust project
+
+cargo add --git https://github.com/dustyw0lf/libanti.git
 
 ## Examples
 build an example in either debug or release mode
