@@ -13,7 +13,9 @@ This library contains functions to detect attempts to tamper with a running proc
 ## Usage
 Add `libanti` as a dependency to your Rust project
 
+```bash
 cargo add --git https://github.com/dustyw0lf/libanti.git
+```
 
 ## Examples
 build an example in either debug or release mode
