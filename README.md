@@ -1,4 +1,4 @@
-# Linux Anti Reversing
+# LibAnti - Linux Anti Reversing
 
 This library contains functions to detect attempts to tamper with a running process. Currently implemented without obfuscation:
 1. Debugger detection:
